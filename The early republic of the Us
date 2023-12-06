@@ -1,0 +1,288 @@
+import time
+import random
+
+class Player:
+    def __init__(self):
+        self.coins = 0
+        self.inventory = {"Armor": {"level": 1, "defense": 5}, "Sword": {"level": 1, "attack": 10}}
+        self.xp = 0
+        self.level = 1
+        self.position = {"x": 0, "y": 0}  # Player's position on the mini-map
+
+    def earn_coins(self, amount):
+        self.coins += amount
+
+    def spend_coins(self, amount):
+        if self.coins >= amount:
+            self.coins -= amount
+            return True
+        else:
+            print_slow("You don't have enough coins.")
+            return False
+
+    def add_to_inventory(self, item, level, stat):
+        self.inventory[item] = {"level": level, stat: stat + 5 * level}
+
+    def earn_xp(self, amount):
+        self.xp += amount
+        if self.xp >= 500:
+            self.level_up()
+
+    def level_up(self):
+        self.level += 1
+        self.xp = 0
+        print_slow(f"Congratulations! You've reached Level {self.level}.")
+
+    def move(self, direction):
+        # Update player's position on the mini-map
+        if direction == "north":
+            self.position["y"] += 1
+        elif direction == "south":
+            self.position["y"] -= 1
+        elif direction == "east":
+            self.position["x"] += 1
+        elif direction == "west":
+            self.position["x"] -= 1
+
+    def display_status(self):
+        print_slow(f"Coins: {self.coins}")
+        print_slow(f"XP: {self.xp}")
+        print_slow(f"Level: {self.level}")
+        print_slow("Inventory:")
+        for item, stats in self.inventory.items():
+            print(f"{item} (Level {stats['level']}, {list(stats.keys())[1]} {stats[list(stats.keys())[1]]}")
+        print_slow(f"Mini-map: Current Position ({self.position['x']}, {self.position['y']})")
+
+def print_slow(text):
+    for char in text:
+        print(char, end='', flush=True)
+        time.sleep(0.05)
+    print()
+
+def ask_question(question, choices, correct_choice_index):
+    print_slow(question)
+    for i, choice in enumerate(choices, start=1):
+        print(f"{i}. {choice}")
+
+    while True:
+        try:
+            user_choice = int(input("Your choice (enter the number): "))
+            if 1 <= user_choice <= len(choices):
+                if user_choice == correct_choice_index + 1:
+                    return True
+                else:
+                    print_slow("Incorrect. Try again.")
+                    return False
+            else:
+                print("Invalid choice. Please enter a number between 1 and", len(choices))
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+
+def visit_vendor(player):
+    print_slow("Welcome to the Vendor!")
+    print_slow("You can spend your hard-earned coins here.")
+
+    while True:
+        print_slow("1. Buy Armor")
+        print_slow("2. Buy Sword")
+        print_slow("3. Exit Vendor")
+
+        choice = input("Your choice (enter the number): ")
+
+        if choice == "1":
+            # Replace with your implementation
+            pass
+        elif choice == "2":
+            # Replace with your implementation
+            pass
+        elif choice == "3":
+            print_slow("Exiting Vendor.")
+            break
+        else:
+            print_slow("Invalid choice. Please enter a number between 1 and 3.")
+
+def battle_monster(player):
+    monster_health = random.randint(20, 50)
+    player_attack = 15
+
+    print_slow("A wild monster appears!")
+    print_slow(f"Monster Health: {monster_health}")
+
+    while monster_health > 0:
+        print_slow("1. Attack")
+        print_slow("2. Use Sword (if available)")
+
+        choice = input("Your choice (enter the number): ")
+
+        if choice == "1":
+            monster_health -= player_attack
+            print_slow("You attacked the monster!")
+        elif choice == "2" and "Sword" in player.inventory:
+            monster_health -= 2 * player_attack
+            print_slow("You used the Sword against the monster!")
+        elif choice == "2":
+            print_slow("You don't have a Sword. Choose another option.")
+        else:
+            print_slow("Invalid choice. Please enter 1 or 2.")
+
+        if monster_health > 0:
+            print_slow("The monster counterattacks! You lose 10 health.")
+            # Replace with your implementation
+            pass
+
+        if player_health <= 0:
+            print_slow("You were defeated by the monster. Game Over.")
+            break
+
+    if monster_health <= 0:
+        xp_earned = random.randint(20, 50)
+        player.earn_xp(xp_earned)
+        print_slow(f"You defeated the monster and earned {xp_earned} XP!")
+
+        # After defeating the monster, offer choices to the player
+        print_slow("What would you like to do?")
+        print_slow("1. Continue playing the game")
+        print_slow("2. Visit the Vendor")
+
+        choice = input("Your choice (enter the number): ")
+
+        if choice == "1":
+            print_slow("You continue your journey...")
+            # Add additional game content if desired
+        elif choice == "2":
+            visit_vendor(player)
+
+def final_boss_battle(player):
+    print_slow("You've reached the final boss!")
+    print_slow("Prepare yourself for a challenging battle.")
+
+    boss_health = 750
+    player_attack = 25
+
+    while boss_health > 0:
+        print_slow(f"Boss Health: {boss_health}")
+        print_slow("1. Attack")
+        print_slow("2. Use Sword (if available)")
+
+        choice = input("Your choice (enter the number): ")
+
+        if choice == "1":
+            boss_health -= player_attack
+            print_slow("You attacked the boss!")
+        elif choice == "2" and "Sword" in player.inventory:
+            boss_health -= 2 * player_attack
+            print_slow("You used the Sword against the boss!")
+        elif choice == "2":
+            print_slow("You don't have a Sword. Choose another option.")
+        else:
+            print_slow("Invalid choice. Please enter 1 or 2.")
+
+        if boss_health > 0:
+            print_slow("The boss counterattacks! You lose 20 health.")
+            # Replace with your implementation
+            pass
+
+        if player_health <= 0:
+            print_slow("You were defeated by the boss. Game Over.")
+            break
+
+    if boss_health <= 0:
+        xp_earned = random.randint(100, 200)
+        player.earn_xp(xp_earned)
+        print_slow(f"You defeated the final boss and earned {xp_earned} XP!")
+
+def main():
+    player = Player()
+
+    print_slow("Welcome to the Early Republic Adventure Game!")
+
+    print_slow("You are a historian on a quest to explore the mysteries of the Early Republic.")
+    print_slow("As you journey through historical events, answer questions and battle monsters to gain XP.")
+
+    questions = [
+"Which of the following was a defining characteristic of the Era of Good Feelings?",
+    "The Whiskey Rebellion challenged the idea that —",
+    "This list provides examples of —",
+    "Which problem did George Washington encounter when he became president?",
+    "How did the War of 1812 affect the U.S. economy?",
+    "The decision in Marbury v. Madison was significant in U.S. history because it —",
+    "Which action should be added to this list?",
+    "In the early 1800s, the United States nearly doubled its size as a result of the —",
+    "How did Alexander Hamilton propose to pay off the Revolutionary War debt?",
+    "Which of the following was supported by followers of Thomas Jefferson, but not by supporters of Alexander Hamilton?",
+    "Which of the below did not allow further European interference in the Americas?",
+    "Which court case gave the government the power to regulate foreign and interstate commerce?",
+    "During the War of 1812, the British Army",
+    "Which of the following launched Andrew Jackson as a national figure?",
+    "Which reason motivated industrialists in northern states to favor tariffs during the early 1800s?",
+    "Thomas Jefferson characteristics —",
+    "Alexander Hamilton characteristics —",
+    "Alexander Hamilton’s Plan to Improve the US Economy",
+    "Disagreements between Thomas Jefferson and Alexander Hamilton led to —",
+    "George Washington warned future Americans to steer clear of permanent alliances in his farewell address.",
+    "What led to the Treaty of Ghent"
+]
+        
+    choices = [
+        ["A. Economic disparity", "B. There was a renewed sense of nationalism", "C. Social inequality", "D. Cultural diversity"],
+    ["A. Taxation without representation", "B. The federal government had the power to pass and enforce tax laws", "C. Federal government has limited power", "D. States can nullify federal laws"],
+    ["A. International conflicts between European nations", "B. Domestic issues faced by the leaders of the new republic", "C. Religious tensions in the colonies", "D. Economic challenges in the southern states, The Whiskey Rebellion, The Bank of the United States, The Alien and Sedition Acts, and Marbury v. Madison"],
+    ["A. Political parties", "B. Threat of war with Britain", "C. The United States had large debts from the American Revolution.", "D. Control of western lands"],
+    ["A. Economic growth", "B. Economic recession", "C. Economic stability", "D. Economic independence"],
+    ["A. Wrote the Supreme Court decision that established the principle of judicial review", "B. Established the principle of checks and balances", "C. Increased the power of state governments", "D. Decreased the power of the federal government"],
+    ["A. Established a national bank", "B. Declared war on France", "C. Acquired the Louisiana Territory", "D. Issued the Emancipation Proclamation, John Marshall, Promoted the public good, Maintained a strong sense of duty, and Used clear language to discuss complex issues"],
+    ["A. Louisiana Purchase", "B. Embargo Act", "C. Lewis and Clark Expedition", "D. War of 1812"],
+    ["A. Taxing exports", "B. Selling public lands", "C. Issuing paper money", "D. Creating a national bank"],
+    ["A. Strict interpretation of the Constitution", "B. Loose interpretation of the Constitution", "C. Protective tariffs", "D. National bank"],
+    ["A. Monroe Doctrine", "B. Treaty of Paris (1783)", "C. XYZ Affair", "D. Proclamation of Neutrality"],
+    ["A. Gibbons v. Ogden", "B. Worcester v. Georgia", "C. McCulloch v. Maryland", "D. Dred Scott v. Sandford"],
+    ["A. Captured and burned much of Washington, D.C.", "B. Was defeated at the Battle of New Orleans", "C. Withdrew from Canada", "D. Burned the White House"],
+    ["A. Battle of Tippecanoe", "B. Battle of New Orleans", "C. Battle of Saratoga", "D. Battle of Yorktown"],
+    ["A. To protect domestic industries from foreign competition", "B. To fund internal improvements", "C. To support agricultural subsidies", "D. To raise revenue for the federal government"],
+    ["A. Urban, Strong Federal Government, Federalist", "B. Rural, Weak Federal Government, Republican", "C. Urban, Weak Federal Government, Republican", "D. Rural, Strong Federal Government, Federalist"],
+    ["A. Urban, Strong Federal Government, Federalist", "B. Rural, Weak Federal Government, Republican", "C. Urban, Weak Federal Government, Republican", "D. Rural, Strong Federal Government, Federalist"],
+    ["A. Establishing a national bank", "B. Eliminating the national debt", "C. Imposing protective tariffs", "D. Abolishing slavery"],
+    ["A. Political unity", "B. Economic growth", "C. Westward expansion", "D. Abolition of slavery"],
+    ["A. Permanent alliances with European nations", "B. The formation of political parties", "C. The establishment of the Electoral College", "D. The development of the two-party system"],
+    ["A. War of 1812", "B. Treaty of Paris (1783)", "C. Louisiana Purchase", "D. Monroe Doctrine"]
+]
+
+correct_choices = [2, 2, 1, 3, 2, 1, 2, 1, 2, 1, 1, 3, 0, 1, 0, 2, 1, 0, 1, 3, 0, 1]
+
+    score = 0
+    for i in range(len(questions)):
+        while not ask_question(questions[i], choices[i], correct_choices[i]):
+            pass  # Continue asking the same question until the player answers correctly
+
+        print_slow("Correct! You earn 10 golden coins.")
+        player.earn_coins(10)
+        player.earn_xp(50)  # Earn XP for answering questions correctly
+        score += 1
+
+        # Introduce random monster encounters
+        if random.choice([True, False]):
+            battle_monster(player)
+
+        # Move the player on the mini-map after each question
+        player.move(random.choice(["north", "south", "east", "west"]))
+
+    player.display_status()
+
+    # Add final boss battle
+    final_boss_battle(player)
+
+    # After defeating the boss, offer choices to the player
+    print_slow("You've defeated the final boss! What would you like to do?")
+    print_slow("1. Continue playing from where you left off")
+    print_slow("2. Exit to the main menu")
+
+    final_choice = input("Your choice (enter the number): ")
+
+    if final_choice == "1":
+        print_slow("You continue your journey...")
+        # Add additional game content if desired
+    elif final_choice == "2":
+        print_slow("Exiting to the main menu. Thanks for playing!")
+
+if __name__ == "__main__":
+    main()
